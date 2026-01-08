@@ -95,6 +95,7 @@
         <p>Consultant Physician</p>
         <p>MBBS, MD (DNB Family Medicine)</p>
         <p>📞 +91 70114 19597</p>
+        
       </div>
       <div class="doctor-photo-wrapper">
         <img src="doctor.jpg" alt="Doctor" style="width:100%; border-radius:10px;" />
@@ -112,7 +113,7 @@
         <div class="box patient-info-box">
           <h3>Patient Information</h3>
           <label>Name *</label>
-          <input type="text" id="name" required />
+          <input type="text" id="iname" required />
           <label>Mobile Number *</label>
           <input type="tel" id="mobile" required />
           <label>Blood Group *</label>
@@ -166,6 +167,13 @@
 <script>
   const { jsPDF } = window.jspdf;
 
+  document.addEventListener("DOMContentLoaded", function() {
+      const dateDiv = document.getElementById("currentDate");
+      const today = new Date();
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      dateDiv.textContent = today.toLocaleDateString('en-IN', options);
+  });
+
   document.getElementById("patientForm").addEventListener("submit", function(e) {
     e.preventDefault();
 
@@ -173,11 +181,12 @@
     const pageWidth = doc.internal.pageSize.getWidth();
     const margin = 15;
     let y = 20;
-
-    const today = new Date().toLocaleDateString("en-IN");
+    const today = new Date();
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const formattedDate = today.toLocaleDateString('en-IN', options);
 
     const data = {
-      name: name.value,
+      iname: iname.value,
       mobile: mobile.value,
       bloodgroup: bloodgroup.value,
       address: address.value,
@@ -186,7 +195,8 @@
       symptoms: symptoms.value,
       vitals: vitals.value,
       diagnosis: diagnosis.value,
-      prescription: prescription.value
+      prescription: prescription.value,
+      formattedDate: formattedDate 
     };
 
     /* ---------- HEADER ---------- */
@@ -202,6 +212,8 @@
     doc.text("MBBS, MD (DNB Family Medicine)", margin, y);
     y += 5;
     doc.text("+91 70114 19597", margin, y);
+    y += 5;
+    doc.text(`Date: ${formattedDate}`, margin, y);
 
     /* ---------- PATIENT INFO (RIGHT) ---------- */
     const rightX = pageWidth - margin - 80;
@@ -213,20 +225,20 @@
     py += 6;
 
     doc.setFontSize(10);
-doc.text(`Name: ${data.name}`, rightX, py); 
-py += 5;
+    doc.text(`Name: ${data.iname}`, rightX, py); 
+    py += 5;
 
-doc.text(`Age: ${data.age}    Gender: ${data.gender}`, rightX, py);
-py += 5;
+    doc.text(`Age: ${data.age}    Gender: ${data.gender}`, rightX, py);
+    py += 5;
 
-doc.text(`Mobile: ${data.mobile}    Blood Group: ${data.bloodgroup}`, rightX, py);
-py += 5;
+    doc.text(`Mobile: ${data.mobile}    Blood Group: ${data.bloodgroup}`, rightX, py);
+    py += 5;
 
-const addressText = doc.splitTextToSize(
-  `Address: ${data.address}`,
-  85
-);
-doc.text(addressText, rightX, py);
+    const addressText = doc.splitTextToSize(
+      `Address: ${data.address}`,
+      85
+    );
+    doc.text(addressText, rightX, py);
 
 
     /* ---------- DIVIDER ---------- */
@@ -263,7 +275,7 @@ doc.text(addressText, rightX, py);
       { align: "center" }
     );
 
-    doc.save(`${data.mobile}.pdf`);
+    doc.save(`${data.iname}_${data.mobile}_${data.formattedDate}.pdf`);
   });
 </script>
 
